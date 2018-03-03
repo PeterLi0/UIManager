@@ -6,7 +6,7 @@ using System.Linq;
 /// <summary>
 /// 所有界面类的基类
 /// </summary>
-public abstract class BaseWnd
+public abstract class BaseWindow
 {
     protected Transform _transform;
     public string name;
@@ -36,14 +36,14 @@ public abstract class BaseWnd
 
     public virtual void Update(float dt) { }
 }
-class UIManager : Single<UIManager>
+class UIManager : SingleTon<UIManager>
 {
     public Transform _canvas;
 
     // 保存所有的打开的窗口
-    public Dictionary<string, BaseWnd> _windows = new Dictionary<string, BaseWnd>();
+    public Dictionary<string, BaseWindow> _windows = new Dictionary<string, BaseWindow>();
 
-    //public Camera uiCamera;
+    public Camera uiCamera;
 
     /// <summary>
     /// 初始化
@@ -52,7 +52,7 @@ class UIManager : Single<UIManager>
     {
         MonoBehaviour.DontDestroyOnLoad(GameObject.Find("UI"));
         _canvas = GameObject.Find("UI/Canvas").transform;
-        //uiCamera = GameObject.Find("UI/Camera").GetComponent<Camera>();
+        uiCamera = GameObject.Find("UI/Camera").GetComponent<Camera>();
     }
 
     /// <summary>
@@ -60,7 +60,7 @@ class UIManager : Single<UIManager>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public T Open<T>() where T : BaseWnd, new()
+    public T Open<T>() where T : BaseWindow, new()
     {
         string wndName = typeof(T).Name;
         if (_windows.ContainsKey(wndName))
@@ -81,7 +81,7 @@ class UIManager : Single<UIManager>
     /// 关闭窗口 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public void Close<T>() where T : BaseWnd
+    public void Close<T>() where T : BaseWindow
     {
         string wndName = typeof(T).Name;
         if (_windows.ContainsKey(wndName))
@@ -91,7 +91,7 @@ class UIManager : Single<UIManager>
         }
     }
 
-    public T Get<T>() where T : BaseWnd
+    public T Get<T>() where T : BaseWindow
     {
         string wndName = typeof(T).Name;
         if (_windows.ContainsKey(wndName))
@@ -100,7 +100,7 @@ class UIManager : Single<UIManager>
         }
         else
         {
-            return null;
+            return default(T);
         }
     }
 
@@ -112,7 +112,7 @@ class UIManager : Single<UIManager>
         }
     }
 }
-public class Single<T> where T : class, new()
+public class SingleTon<T> where T : class, new()
 {
     private static T _instance;
 
